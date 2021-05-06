@@ -1,4 +1,4 @@
-function ImagePupup(props) {
+function ImagePopup(props) {
   const {isOpen, onClose, selectedCard} = props;
   const src = selectedCard ? selectedCard.link : '#';
   const title = selectedCard ? selectedCard.name : '';
@@ -18,4 +18,4 @@ function ImagePupup(props) {
   );
 }
 
-export default ImagePupup;
+export default ImagePopup;

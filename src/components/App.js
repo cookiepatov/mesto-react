@@ -4,7 +4,7 @@ import Header from "./Header";
 import Main from "./Main"
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
-import ImagePupup from "./ImagePopup";
+import ImagePopup from "./ImagePopup";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
@@ -61,7 +61,7 @@ function App() {
         <span className="popup__error avatar-link-input-error">Вы пропустили это поле.</span>
         <button type="submit" className="popup__button">Сохранить</button>
       </PopupWithForm>
-      <ImagePupup isOpen={isImagePopupOpen} onClose={closeAllPopups} selectedCard={selectedCard}/>
+      <ImagePopup isOpen={isImagePopupOpen} onClose={closeAllPopups} selectedCard={selectedCard}/>
     </div>
   );
 }
