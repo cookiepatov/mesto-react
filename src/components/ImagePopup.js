@@ -1,3 +1,5 @@
+import React from 'react';
+
 function ImagePopup(props) {
   const {isOpen, onClose, selectedCard} = props;
   const src = selectedCard ? selectedCard.link : '#';

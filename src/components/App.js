@@ -1,15 +1,16 @@
-import {useState} from "react";
+import {React, useState} from 'react';
 
-import Header from "./Header";
-import Main from "./Main"
-import Footer from "./Footer";
-import PopupWithForm from "./PopupWithForm";
-import ImagePopup from "./ImagePopup";
+import Header from './Header';
+import Main from './Main'
+import Footer from './Footer';
+import PopupWithForm from './PopupWithForm';
+import ImagePopup from './ImagePopup';
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
+  const [isDeleteCardPopupOpen, setDeleteCardPopupOpen] = useState(false);
   const [isImagePopupOpen, setImagePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null)
   function handleEditAvatarClick() {
@@ -25,12 +26,16 @@ function App() {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
     setAddPlacePopupOpen(false);
+    setDeleteCardPopupOpen(false)
     setImagePopupOpen(false);
     setSelectedCard(null);
   }
   function handleCardClick(card) {
     setSelectedCard(card);
     setImagePopupOpen(true);
+  }
+  function handleDeleteCard(card) {
+    setDeleteCardPopupOpen(true);
   }
   return (
     <div className="page">
@@ -40,6 +45,7 @@ function App() {
         onAddPlace={handleAddPlaceClick}
         onEditAvatar={handleEditAvatarClick}
         onCardClick={handleCardClick}
+        onDeleteCard={handleDeleteCard}
       />
       <Footer />
       <PopupWithForm name={'profile'} title={'Редактировать профиль'} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups}>
@@ -60,6 +66,9 @@ function App() {
         <input id="avatar-link-input" name="data" required type="url" className="popup__input popup__input_type_data" placeholder="Ссылка на аватар" />
         <span className="popup__error avatar-link-input-error">Вы пропустили это поле.</span>
         <button type="submit" className="popup__button">Сохранить</button>
+      </PopupWithForm>
+      <PopupWithForm name={'remove-card'} title={'Вы уверены?'} isOpen={isDeleteCardPopupOpen} onClose={closeAllPopups}>
+        <button type="submit" className="popup__button">Да</button>
       </PopupWithForm>
       <ImagePopup isOpen={isImagePopupOpen} onClose={closeAllPopups} selectedCard={selectedCard}/>
     </div>

@@ -1,18 +1,18 @@
-import {useEffect, useState} from "react";
+import {React, useEffect, useState} from 'react';
 
 import {api} from '../utils/api';
 
-import Card from "./Card";
+import Card from './Card';
 
 function Main(props) {
-  const {onEditProfile, onAddPlace, onEditAvatar, onCardClick} = props;
+  const {onEditProfile, onAddPlace, onEditAvatar, onCardClick, onDeleteCard} = props;
   const [userName, setUserName] = useState('Жак Ив Кусто');
   const [userDescription, setUserDescription] = useState('Морской исследователь');
   const [userAvatar, setUserAvatar] = useState('#');
   const [cards, setCards] = useState([]);
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([{ name, about, _id, avatar }, cards]) => {
+      .then(([{ name, about, avatar }, cards]) => {
         setUserAvatar(avatar);
         setUserName(name);
         setUserDescription(about);
@@ -33,7 +33,7 @@ function Main(props) {
       </section>
 
       <section className="elements">
-        {cards.map(item => <Card card={item} key={item._id} onCardClick={onCardClick}/>)}
+        {cards.map(item => (<Card card={item} key={item._id} onCardClick={onCardClick} onDeleteClick={onDeleteCard}/>))}
       </section>
     </main>
   );
