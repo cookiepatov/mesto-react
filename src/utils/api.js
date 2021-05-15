@@ -81,6 +81,13 @@ class Api {
     }).then(res => this._resultHandler(res));
   }
 
+  changeLikeCardStatus(id, setLiked) {
+    if(setLiked) {
+      return this.likeCard(id);
+    }
+    return this.dislikeCard(id);
+  }
+
   likeCard(id) {
     return fetch(this._baseUrl + '/cards/likes/' + id, {
       method: 'PUT',
