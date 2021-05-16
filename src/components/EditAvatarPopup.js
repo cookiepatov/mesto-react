@@ -8,7 +8,21 @@ function EditAvatarPopup(props) {
   const linkRef = useRef('');
   const interval = useRef();
 
+  const [formValidity, setFormValidity] = useState(true);
+  const [linkIsValid, setLinkIsValid] = useState(true);
+  const [linkClassName, setLinkClassName] = useState('popup__input')
+  const [linkErrorMsg, setLinkErrorMsg] = useState('');
+  const [linkErrorMsgClassName, setLinkErrorMsgClassName] = useState('popup__error')
+
   const [buttonText, setButtonText] = useState('Сохранить');
+
+  useEffect(() => {
+    setFormValidity(linkIsValid);
+  },[linkIsValid])
+
+  useEffect(() => {
+    clearValidation();
+  },[isOpen])
 
   useEffect(() => {
     if (isLoading) {
@@ -25,7 +39,7 @@ function EditAvatarPopup(props) {
   },[isLoading])
 
   useEffect(() => {
-    linkRef.current = currentUser.avatar||'';
+    linkRef.current = currentUser.avatar;
   }, [currentUser]);
 
   function handleSubmit(e) {
@@ -33,8 +47,30 @@ function EditAvatarPopup(props) {
     onUpdateAvatar(linkRef.current);
   }
 
-  function handleLinkChange(e) {
-    linkRef.current = e.target.value;
+  function handleLinkChange({target}) {
+    const {value, validity, validationMessage} = target;
+    linkRef.current = value;
+    handleLinkValidity(validity.valid, validationMessage);
+  }
+
+  function handleLinkValidity(isValid, errorText) {
+    setLinkIsValid(isValid);
+    if (isValid) {
+      setLinkClassName('popup__input');
+      setLinkErrorMsg('');
+      setLinkErrorMsgClassName('popup__error');
+    } else {
+      setLinkClassName('popup__input popup__input_type_error');
+      setLinkErrorMsg(errorText);
+      setLinkErrorMsgClassName('popup__error popup__error_visible');
+    }
+  }
+
+  function clearValidation() {
+    setLinkIsValid(true);
+    setLinkClassName('popup__input')
+    setLinkErrorMsg('');
+    setLinkErrorMsgClassName('popup__error');
   }
 
   return (
@@ -49,12 +85,17 @@ function EditAvatarPopup(props) {
         name="data"
         required
         type="url"
-        className="popup__input popup__input_type_data"
+        className={linkClassName}
         placeholder="Ссылка на аватар"
         defaultValue={linkRef.current}
-        onChange={handleLinkChange}/>
-      <span className="popup__error avatar-link-input-error">Вы пропустили это поле.</span>
-      <button type="submit" className="popup__button">{buttonText}</button>
+        onChange={handleLinkChange} />
+      <span className={linkErrorMsgClassName}>{linkErrorMsg}</span>
+      <button
+        type="submit"
+        className="popup__button"
+        disabled={!formValidity}>
+          {buttonText}
+      </button>
     </PopupWithForm>
 
   )
