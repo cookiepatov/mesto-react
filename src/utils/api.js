@@ -38,13 +38,13 @@ class Api {
         'Content-Type': this._contentType
       },
       body: JSON.stringify({
-        name: name,
-        about: about
+        name,
+        about
       })
     }).then(res => this._resultHandler(res));
   }
 
-  setUserAvatar(src) {
+  setUserAvatar(avatar) {
     return fetch(this._baseUrl + '/users/me/avatar', {
       method: 'PATCH',
       headers: {
@@ -52,7 +52,7 @@ class Api {
         'Content-Type': this._contentType
       },
       body: JSON.stringify({
-        avatar: src
+        avatar
       })
     }).then(res => this._resultHandler(res));
 
@@ -66,8 +66,8 @@ class Api {
         'Content-Type': this._contentType
       },
       body: JSON.stringify({
-        name: name,
-        link: link
+        name,
+        link
       })
     }).then(res => this._resultHandler(res));
   }

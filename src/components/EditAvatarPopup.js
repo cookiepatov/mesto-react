@@ -1,14 +1,31 @@
-import {React, useEffect, useContext, useRef} from 'react';
+import {React, useEffect, useContext, useRef, useState} from 'react';
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 import PopupWithForm from './PopupWithForm';
 
 function EditAvatarPopup(props) {
-  const {isOpen, onClose, onUpdateAvatar} = props;
+  const {isOpen, onClose, onUpdateAvatar, isLoading} = props;
   const currentUser = useContext(CurrentUserContext);
   const linkRef = useRef('');
+  const interval = useRef();
+
+  const [buttonText, setButtonText] = useState('Сохранить');
 
   useEffect(() => {
-    linkRef.current = currentUser.avatar;
+    if (isLoading) {
+      const dots = ['.','..','...'];
+      let i = 0
+      interval.current = setInterval(()=>{
+        setButtonText(`Сохранение${dots[i]}`);
+        i = (i === 2) ? 0 : i + 1;
+      },500)
+    } else {
+      clearInterval(interval.current)
+      setButtonText(`Сохранить`);
+    }
+  },[isLoading])
+
+  useEffect(() => {
+    linkRef.current = currentUser.avatar||'';
   }, [currentUser]);
 
   function handleSubmit(e) {
@@ -37,7 +54,7 @@ function EditAvatarPopup(props) {
         defaultValue={linkRef.current}
         onChange={handleLinkChange}/>
       <span className="popup__error avatar-link-input-error">Вы пропустили это поле.</span>
-      <button type="submit" className="popup__button">Сохранить</button>
+      <button type="submit" className="popup__button">{buttonText}</button>
     </PopupWithForm>
 
   )

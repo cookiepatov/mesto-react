@@ -1,16 +1,65 @@
-import {React, useState, useEffect, useContext} from 'react';
+import {React, useState, useEffect, useContext, useRef} from 'react';
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 import PopupWithForm from './PopupWithForm';
 
 function EditProfilePopup(props) {
+  const {isOpen, onClose, onUpdateUser, isLoading} = props
+
   const currentUser = useContext(CurrentUserContext);
-  const [description, setDescription] = useState('');
+
+  const [buttonText, setButtonText] = useState('Сохранить');
+
   const [name, setName] = useState('');
+  const [nameIsValid, setNameIsValid] = useState(true);
+  const [nameClassName, setNameClassName] = useState('popup__input')
+  const [nameErrorMsg, setNameErrorMsg] = useState('');
+  const [nameErrorMsgClassName, setNameErrorMsgClassName] = useState('popup__error')
+
+  const [description, setDescription] = useState('');
+  const [descriptionIsValid, setDescriptionIsValid] = useState(true);
+  const [descriptionClassName, setDescriptionClassName] = useState('popup__input')
+  const [descriptionErrorMsg, setDescriptionErrorMsg] = useState('');
+  const [descriptionErrorMsgClassName, setDescriptionErrorMsgClassName] = useState('popup__error')
+
+  const [formValidity, setFormValidity] = useState(true);
+
+  const interval = useRef();
+
   useEffect(() => {
-    setName(currentUser.name);
-    setDescription(currentUser.about);
-  }, [currentUser])
-  const {isOpen, onClose, onUpdateUser} = props
+    if (isLoading) {
+      const dots = ['.','..','...'];
+      let i = 0
+      interval.current = setInterval(()=>{
+        setButtonText(`Сохранение${dots[i]}`);
+        i = (i === 2) ? 0 : i + 1;
+      },500)
+    } else {
+      clearInterval(interval.current)
+      setButtonText(`Сохранить`);
+    }
+  },[isLoading])
+
+  useEffect(() => {
+    setName(currentUser.name||'');
+    setDescription(currentUser.about||'');
+    clearValidation();
+  }, [currentUser, isOpen]);
+
+  useEffect(() => {
+    setFormValidity(nameIsValid && descriptionIsValid);
+  }, [nameIsValid, descriptionIsValid])
+
+  function clearValidation() {
+    setNameIsValid(true);
+    setNameClassName('popup__input');
+    setNameErrorMsg('');
+    setNameErrorMsgClassName('popup__error');
+
+    setDescriptionIsValid(true);
+    setDescriptionClassName('popup__input')
+    setDescriptionErrorMsg('');
+    setDescriptionErrorMsgClassName('popup__error');
+  }
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -20,12 +69,42 @@ function EditProfilePopup(props) {
     })
   }
 
-  function handleNameChange(e) {
-    setName(e.target.value);
+  function handleNameChange({target}) {
+    const {value, validity, validationMessage} = target;
+    setName(value);
+    handleNameValidity(validity.valid, validationMessage)
   }
 
-  function handleDescriptionChange(e) {
-    setDescription(e.target.value);
+  function handleDescriptionChange({target}) {
+    const {value, validity, validationMessage} = target;
+    setDescription(value);
+    handleDescriptionValidity(validity.valid, validationMessage)
+  }
+
+  function handleNameValidity(isValid, errorText) {
+    setNameIsValid(isValid);
+    if (isValid) {
+      setNameClassName('popup__input');
+      setNameErrorMsg('');
+      setNameErrorMsgClassName('popup__error');
+    } else {
+      setNameClassName('popup__input popup__input_type_error');
+      setNameErrorMsg(errorText);
+      setNameErrorMsgClassName('popup__error popup__error_visible');
+    }
+  }
+
+  function handleDescriptionValidity(isValid, errorText) {
+    setDescriptionIsValid(isValid);
+    if (isValid) {
+      setDescriptionClassName('popup__input');
+      setDescriptionErrorMsg('');
+      setDescriptionErrorMsgClassName('popup__error')
+    } else {
+      setDescriptionClassName('popup__input popup__input_type_error');
+      setDescriptionErrorMsg(errorText);
+      setDescriptionErrorMsgClassName('popup__error popup__error_visible')
+    }
   }
 
   return (
@@ -41,22 +120,27 @@ function EditProfilePopup(props) {
         required
         minLength="2"
         maxLength="40"
-        className="popup__input popup__input_type_name"
+        className={nameClassName}
         placeholder="Ваше имя"
-        defaultValue={name}
+        value={name}
         onChange={handleNameChange} />
-      <span className="popup__error profile-name-input-error">Вы пропустили это поле.</span>
+      <span className={nameErrorMsgClassName}>{nameErrorMsg}</span>
       <input
         id="profile-description-input"
         name="description"
         required minLength="2"
         maxLength="200"
-        className="popup__input popup__input_type_data"
+        className={descriptionClassName}
         placeholder="Описание"
-        defaultValue={description}
+        value={description}
         onChange={handleDescriptionChange} />
-      <span className="popup__error profile-description-input-error">Вы пропустили это поле.</span>
-      <button type="submit" className="popup__button">Сохранить</button>
+      <span className={descriptionErrorMsgClassName}>{descriptionErrorMsg}</span>
+      <button
+        type="submit"
+        className="popup__button"
+        disabled={!formValidity}>
+          {buttonText}
+      </button>
     </PopupWithForm>)
 }
 
