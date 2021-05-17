@@ -4,8 +4,8 @@ import PopupWithForm from './PopupWithForm';
 function DeleteCardPopup(props) {
   const {isOpen, onClose, selectedCard, onDeleteCard, isLoading} = props;
   const [buttonText, setButtonText] = useState('Да');
-
   const interval = useRef();
+
   useEffect(() => {
     if (isLoading) {
       const dots = ['.','..','...'];
@@ -33,8 +33,9 @@ function DeleteCardPopup(props) {
       title={'Вы уверены?'}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}>
-    <button type="submit" className="popup__button">{buttonText}</button>
+      onSubmit={handleSubmit}
+      buttonText={buttonText}
+      formValidity={true}>
   </PopupWithForm>
 
   )

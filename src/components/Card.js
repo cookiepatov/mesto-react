@@ -11,19 +11,20 @@ function Card(props) {
 
   const [likeIsLoading, setLikeIsLoading] = useState(false);
   const {_id: currentUserId} = useContext(CurrentUserContext);
+
   const {likes, owner, name, link} = card;
   const currentOwnerId = owner._id;
-
-  useEffect(() => {
-    setLikeIsLoading(false);
-  },[likes])
-
   const isOwn = currentUserId === currentOwnerId;
   const isLiked = likes.some(like => like._id === currentUserId);
+
   const deleteBtnClassName = isOwn ? 'element__delete-button' : 'element__delete-button element__delete-button_hidden';
   const likeBtnLikedClassName = isLiked ? 'element__like-button element__like-button_active' : '';
   const likeBtnLoadingClassName = likeIsLoading ? 'element__like-button_loading' : ''
   const likeBtnClassName = `element__like-button ${likeBtnLikedClassName} ${likeBtnLoadingClassName}`
+
+  useEffect(() => {
+    setLikeIsLoading(false);
+  },[likes])
 
   function handleClick() {
     onCardClick(card);

@@ -1,28 +1,20 @@
-import {React, useEffect, useContext, useRef, useState} from 'react';
-import {CurrentUserContext} from '../contexts/CurrentUserContext';
+import {React, useEffect, useRef, useState} from 'react';
 import PopupWithForm from './PopupWithForm';
+import {useFormAndValidation} from '../utils/validator'
+import {validationSettings} from '../utils/constants';
 
 function EditAvatarPopup(props) {
   const {isOpen, onClose, onUpdateAvatar, isLoading} = props;
-  const currentUser = useContext(CurrentUserContext);
-  const linkRef = useRef('');
-  const interval = useRef();
-
-  const [formValidity, setFormValidity] = useState(true);
-  const [linkIsValid, setLinkIsValid] = useState(true);
-  const [linkClassName, setLinkClassName] = useState('popup__input')
-  const [linkErrorMsg, setLinkErrorMsg] = useState('');
-  const [linkErrorMsgClassName, setLinkErrorMsgClassName] = useState('popup__error')
-
+  const {inputClass, errorClass} = validationSettings;
+  const {values,
+    handleChange,
+    errors,
+    inputsClasses,
+    errorsClasses,
+    isValid,
+    resetForm} = useFormAndValidation();
   const [buttonText, setButtonText] = useState('Сохранить');
-
-  useEffect(() => {
-    setFormValidity(linkIsValid);
-  },[linkIsValid])
-
-  useEffect(() => {
-    clearValidation();
-  },[isOpen])
+  const interval = useRef();
 
   useEffect(() => {
     if (isLoading) {
@@ -39,38 +31,17 @@ function EditAvatarPopup(props) {
   },[isLoading])
 
   useEffect(() => {
-    linkRef.current = currentUser.avatar;
-  }, [currentUser]);
+    resetForm(
+      {data: ''},
+      {data: ''},
+      {data: inputClass},
+      {data: errorClass},
+      false);
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
-    onUpdateAvatar(linkRef.current);
-  }
-
-  function handleLinkChange({target}) {
-    const {value, validity, validationMessage} = target;
-    linkRef.current = value;
-    handleLinkValidity(validity.valid, validationMessage);
-  }
-
-  function handleLinkValidity(isValid, errorText) {
-    setLinkIsValid(isValid);
-    if (isValid) {
-      setLinkClassName('popup__input');
-      setLinkErrorMsg('');
-      setLinkErrorMsgClassName('popup__error');
-    } else {
-      setLinkClassName('popup__input popup__input_type_error');
-      setLinkErrorMsg(errorText);
-      setLinkErrorMsgClassName('popup__error popup__error_visible');
-    }
-  }
-
-  function clearValidation() {
-    setLinkIsValid(true);
-    setLinkClassName('popup__input')
-    setLinkErrorMsg('');
-    setLinkErrorMsgClassName('popup__error');
+    onUpdateAvatar(values.data);
   }
 
   return (
@@ -79,27 +50,22 @@ function EditAvatarPopup(props) {
       title={'Обновить аватар'}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}>
+      onSubmit={handleSubmit}
+      buttonText={buttonText}
+      formValidity={isValid}>
       <input
         id="avatar-link-input"
         name="data"
         required
         type="url"
-        className={linkClassName}
+        className={inputsClasses.data}
         placeholder="Ссылка на аватар"
-        defaultValue={linkRef.current}
-        onChange={handleLinkChange} />
-      <span className={linkErrorMsgClassName}>{linkErrorMsg}</span>
-      <button
-        type="submit"
-        className="popup__button"
-        disabled={!formValidity}>
-          {buttonText}
-      </button>
+        value={values.data}
+        onChange={handleChange} />
+      <span className={errorsClasses.data}>{errors.data}</span>
     </PopupWithForm>
 
   )
 }
-
 
 export default EditAvatarPopup;

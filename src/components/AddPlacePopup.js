@@ -1,27 +1,21 @@
 import {React, useState, useEffect, useRef} from 'react';
 import PopupWithForm from './PopupWithForm';
+import {useFormAndValidation} from '../utils/validator';
+import {validationSettings} from '../utils/constants';
 
 function AddPlacePopup(props) {
   const {isOpen, onClose, onAddPlace, isLoading} = props;
-
+  const {inputClass, errorClass} = validationSettings;
+  const {values,
+    handleChange,
+    errors,
+    inputsClasses,
+    errorsClasses,
+    isValid,
+    resetForm} = useFormAndValidation();
   const [buttonText, setButtonText] = useState('Сохранить');
-
-  const [name, setName] = useState('');
-  const [nameIsValid, setNameIsValid] = useState(false);
-  const [nameClassName, setNameClassName] = useState('popup__input')
-  const [nameErrorMsg, setNameErrorMsg] = useState('');
-  const [nameErrorMsgClassName, setNameErrorMsgClassName] = useState('popup__error')
-
-  const [link, setLink] = useState('');
-  const [linkIsValid, setLinkIsValid] = useState(false);
-  const [linkClassName, setLinkClassName] = useState('popup__input')
-  const [linkErrorMsg, setLinkErrorMsg] = useState('');
-  const [linkErrorMsgClassName, setLinkErrorMsgClassName] = useState('popup__error')
-
-  const [formValidity, setFormValidity] = useState(false);
-
-
   const interval = useRef();
+
   useEffect(() => {
     if (isLoading) {
       const dots = ['.','..','...'];
@@ -36,70 +30,18 @@ function AddPlacePopup(props) {
     }
   },[isLoading])
 
-
   useEffect(() => {
-    setName('');
-    setLink('');
-    clearValidation();
+    resetForm(
+      {name: '', data: ''},
+      {name: '', data: ''},
+      {name:inputClass, data:inputClass},
+      {name:errorClass, data:errorClass});
   }, [isOpen]);
-
-  useEffect(() => {
-    setFormValidity(nameIsValid && linkIsValid)
-  }, [nameIsValid, linkIsValid]);
 
   function handleSubmit(e) {
     e.preventDefault();
+    const {name, data: link} = values;
     onAddPlace({name, link});
-  }
-
-  function handleNameChange({target}) {
-    const {value, validity, validationMessage} = target;
-    setName(value);
-    handleNameValidity(validity.valid, validationMessage);
-  }
-
-  function handleLinkChange({target}) {
-    const {value, validity, validationMessage} = target;
-    setLink(value);
-    handleLinkValidity(validity.valid, validationMessage);
-  }
-
-  function handleNameValidity(isValid, errorText) {
-    setNameIsValid(isValid);
-    if (isValid) {
-      setNameClassName('popup__input');
-      setNameErrorMsg('');
-      setNameErrorMsgClassName('popup__error');
-    } else {
-      setNameClassName('popup__input popup__input_type_error');
-      setNameErrorMsg(errorText);
-      setNameErrorMsgClassName('popup__error popup__error_visible');
-    }
-  }
-
-  function handleLinkValidity(isValid, errorText) {
-    setLinkIsValid(isValid);
-    if (isValid) {
-      setLinkClassName('popup__input');
-      setLinkErrorMsg('');
-      setLinkErrorMsgClassName('popup__error');
-    } else {
-      setLinkClassName('popup__input popup__input_type_error');
-      setLinkErrorMsg(errorText);
-      setLinkErrorMsgClassName('popup__error popup__error_visible');
-    }
-  }
-
-  function clearValidation() {
-    setNameIsValid(false);
-    setNameClassName('popup__input');
-    setNameErrorMsg('');
-    setNameErrorMsgClassName('popup__error');
-
-    setLinkIsValid(false);
-    setLinkClassName('popup__input')
-    setLinkErrorMsg('');
-    setLinkErrorMsgClassName('popup__error');
   }
 
   return (
@@ -108,32 +50,30 @@ function AddPlacePopup(props) {
       title={'Новое место'}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}>
+      onSubmit={handleSubmit}
+      buttonText={buttonText}
+      formValidity={isValid}>
       <input
         id="place-name-input"
         name="name"
         required
         minLength="2"
         maxLength="30"
-        className={nameClassName}
+        className={inputsClasses.name}
         placeholder="Название"
-        onChange={handleNameChange}
-        value={name} />
-      <span className={nameErrorMsgClassName}>{nameErrorMsg}</span>
+        onChange={handleChange}
+        value={values.name} />
+      <span className={errorsClasses.name}>{errors.name}</span>
       <input
         id="place-link-input"
         name="data"
         required
         type="url"
-        className={linkClassName}
+        className={inputsClasses.data}
         placeholder="Ссылка на картинку"
-        onChange={handleLinkChange}
-        value={link}/>
-      <span className={linkErrorMsgClassName}>{linkErrorMsg}</span>
-      <button
-        type="submit"
-        className="popup__button"
-        disabled={!formValidity}>{buttonText}</button>
+        onChange={handleChange}
+        value={values.data}/>
+      <span className={errorsClasses.data}>{errors.data}</span>
     </PopupWithForm>
   )
 }

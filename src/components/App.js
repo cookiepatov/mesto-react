@@ -1,4 +1,5 @@
-import { React, useEffect, useState } from 'react';
+import {React, useEffect, useState, useCallback} from 'react';
+
 import {api} from '../utils/api';
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
@@ -32,9 +33,9 @@ function App() {
   }, [])
 
   function handleEditAvatarClick() {
-    document.addEventListener('keydown', closeOnEsc);
-    document.addEventListener('pointerdown', closeOnOverlay);
+    setEventListeners();
     setEditAvatarPopupOpen(true);
+
   }
 
   function handleEditProfileClick() {
@@ -105,8 +106,6 @@ function App() {
     }).catch(console.log);
   }
 
-
-
   function handleConfirmDelete(card) {
     setPopupDataIsLoading(true);
     api.deleteCard(card._id)
@@ -144,17 +143,18 @@ function App() {
     document.removeEventListener('pointerdown', closeOnOverlay);
   }
 
-  function closeOnEsc(e) {
+
+  const closeOnEsc = useCallback((e) => {
     if (e.key === 'Escape') {
       closeAllPopups();
     }
-  }
+  }, []);
 
-  function closeOnOverlay(e) {
+  const closeOnOverlay = useCallback((e) => {
     if (e.target.classList.contains('popup')) {
       closeAllPopups();
     }
-  }
+  }, [])
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
